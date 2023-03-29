@@ -3,13 +3,7 @@ from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 
 
-class UserOut (BaseModel):
-    id: int
-    email: str
-    created_at: datetime = None 
 
-    class Config:
-        orm_mode = True
 
 
 class UserLogin (BaseModel):
@@ -21,11 +15,17 @@ class PostBase(BaseModel):
     name: str
     published: bool =  True
     
+class UserOut (BaseModel):
+    id: int
+    email: str
+    created_at: datetime
 
+    class Config:
+        orm_mode = True
 
 class Post(PostBase):
     id: int = None
-    created_at: datetime = None
+    created_at: datetime
     owner_id: int
     owner: UserOut
 

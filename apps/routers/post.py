@@ -65,7 +65,8 @@ async def get_posts(db: Session = Depends(get_db) , current_user: int = Depends(
 #    posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all()
    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
-   results = db.query(models.Post,func.count(models.Vote.post_id).label("votes count")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter= True).group_by(models.Post.id).all()
+   results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter= True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+   
 #    print(results).all()
 
 
@@ -112,11 +113,12 @@ async def get_posts(db: Session = Depends(get_db) , current_user: int = Depends(
 #     return {"latest post": post}
 
 
-@router.get("/{id}", response_model=schemas.Post)
+@router.get("/{id}", response_model=schemas.PostOut)
 
 async def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
    
-   posts = db.query(models.Post).filter(models.Post.id == id).first()
+#    posts = db.query(models.Post).filter(models.Post.id == id).first()
+   posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter= True).group_by(models.Post.id).filter(models.Post.id == id).first()
 
    
 
